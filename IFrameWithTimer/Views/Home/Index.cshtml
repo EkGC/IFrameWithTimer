@@ -1,0 +1,48 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@model TimerLinks
+
+    <h1>Timer and Links</h1>
+
+<form asp-action="AddLink" method="post">
+        <input type="text" name="link" placeholder="Enter URL" />
+        <button type="submit">Add Link</button>
+</form>
+
+<form asp-action="SetTimer" method="post">
+    <input type="number" name="duration" placeholder="Enter duration in seconds" />
+        <button type="submit">Set Timer</button>
+    </form>
+    <ul>
+        @foreach (var link in Model.Urls)
+        {
+        <li>@link <a asp-route-link="@link" asp-action="DeleteLink" class="btn btn-outline-danger">Delete</a></li>
+        }
+    </ul>
+
+    <iframe id="linkFrame" width="600" height="400"></iframe>
+
+@section Scripts{
+    <script>
+        let links = @Html.Raw(Json.Serialize(Model.Urls));
+        let duration = @Model.Duration * 1000; // Convert to milliseconds
+        let index = 0;
+
+        function loadNextLink() {
+            if (index < links.length) {
+                $('#linkFrame').attr('src', links[index]);
+                index++;
+                setTimeout(loadNextLink, duration);
+            }
+        }
+
+        $(document).ready(function () {
+            console.log(links);
+            if (links.length > 0) {
+                setTimeout(loadNextLink, duration);
+            }
+        });
+    </script>
+    }
